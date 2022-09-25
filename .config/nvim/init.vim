@@ -2,13 +2,16 @@ call plug#begin('~/.vim/plugged')
 
 "basics
 Plug 'preservim/nerdtree'
-Plug 'ryanoasis/vim-devicons'
 Plug 'junegunn/fzf', { 'do': { -> fzf#install() } }
 Plug 'junegunn/fzf.vim'
 Plug 'tpope/vim-fugitive'
 Plug 'tpope/vim-rhubarb'
 Plug 'vim-airline/vim-airline'
 Plug 'vim-airline/vim-airline-themes'
+Plug 'mileszs/ack.vim'
+Plug 'jiangmiao/auto-pairs'
+Plug 'psliwka/vim-smoothie'
+
 
 "frontend
 Plug 'neoclide/coc.nvim', {'branch': 'release'}
@@ -36,7 +39,7 @@ Plug 'maximbaz/lightline-ale'
 call plug#end()
 
 
-" Navigation : {{{ 
+" Navigation : {{{
 
 nnoremap tk  :tabnext<CR>
 nnoremap tj  :tabprev<CR>noremap tj  :tabprev<CR>
@@ -66,7 +69,7 @@ colorscheme gruvbox
 " FzF: {{{
 
 let g:fzf_layout = { 'window': { 'width': 0.8, 'height': 0.5, 'highlight': 'Comment' } }
-nnoremap <C-p> :GFiles<CR>
+nnoremap <C-p> :FZF<CR>
 nnoremap <C-b> :Buffers<CR>
 
 " }}}
@@ -78,33 +81,153 @@ nnoremap <C-n> :NERDTree<CR>
 nnoremap <C-f> :NERDTreeFind<CR>
 nnoremap <C-t> :NERDTreeToggle<CR>
 
-" Start NERDTree and leave the cursor in it.
-autocmd VimEnter * NERDTree
-" Start NERDTree and put the cursor back in the other window.
-autocmd VimEnter * NERDTree | wincmd p
-
-:let g:NERDTreeWinSize=50
-
+let g:NERDTreeWinSize=50
+let g:NERDTreeIgnore=['\.git$', '\.idea$', '\.vscode$', '\.history$', '^bin$[[dir]]','^obj$[[dir]]', '^node_modules$[[dir]]' ]
 " }}}
 
 " Settings: {{{
-filetype indent plugin on
-if !exists('g:syntax_on') | syntax enable | endif
-filetype indent plugin on
+"
 
+" autocomplete menu
+inoremap <expr> <TAB> pumvisible() ? "\<C-y>" : "\<CR>"
+inoremap <expr> <Esc> pumvisible() ? "\<C-e>" : "\<Esc>"
+inoremap <expr> <C-j> pumvisible() ? "\<C-n>" : "\<Down>"
+inoremap <expr> <C-k> pumvisible() ? "\<C-p>" : "\<Up>"
+
+filetype plugin indent on    " required
+
+" Leader key is SPACE, I find it the best
+let mapleader = " "
+
+" render white space
+set listchars=space:.
+set list
+
+" Look and Feel settings
+syntax enable
+set background=dark
+set wildmenu " when opening a file with e.g. :e ~/.vim<TAB> there is a graphical menu of all the matches
+set ttyfast
+set lazyredraw
+set updatetime=300
+set hidden " Open other files if current one is not saved
+
+" Enable Mouse mode in all modes
+set mouse=a
+
+" Numbers
+set relativenumber
+set number
+set numberwidth=4
+set ruler
+
+" paste mode
+nnoremap <F5> :set invpaste paste?<CR>
+set pastetoggle=<F5>
+set showmode
+
+" Treat long lines as break lines
+map j gj
+map k gk
+
+" Indentation
+set autoindent
+set cindent
+set smartindent
+
+" Folding
+" Enable folding
+set foldmethod=syntax
+set foldlevel=99
+
+" Enable folding with the z key
+nmap z za
+
+" Disable all bells and whistles
+set noerrorbells visualbell t_vb=
+
+" Any empty ack search will search for the work the cursor is on
+let g:ack_use_cword_for_empty_search = 1
+nmap <leader>a :Ack!<Space>
+nmap <leader>A :Ack! <cword><CR>
+
+" Tab Options
+set shiftwidth=2
+set tabstop=2
+set softtabstop=2 " Number of spaces a tab counts when editing
+set expandtab
+
+" Delete empty space from the end of lines on every save
+autocmd BufWritePre * :%s/\s\+$//e
+
+" Set default encoding to utf-8
+set encoding=utf-8
+set termencoding=utf-8
+
+" Disable backups and swap files
 set nobackup
 set nowritebackup
+set noswapfile
 
-set autoindent
-set smartindent
-set shiftwidth=2
+set ignorecase " Ignore case when searching
+set smartcase  " When searching try to be smart about cases
+set nohlsearch " Don't highlight search term
+set incsearch  " Jumping search
 
-set title
-set relativenumber 
-set list
-set listchars=space:.
+" Always show the status line
+set laststatus=2
 
-set updatetime=400
+" Allow copy and paste from system clipboard
+set clipboard=unnamed
+
+" Spellcheck for features and markdown
+au BufRead,BufNewFile *.md setlocal spell
+au BufRead,BufNewFile *.md.erb setlocal spell
+au BufRead,BufNewFile *.feature setlocal spell
+
+" Delete characters outside of insert area
+set backspace=indent,eol,start
+
+" +++ Shortcuts +++
+" Open Buffer
+nnoremap <silent><leader>l :Buffers<CR>
+" Open test file for a current file
+nnoremap <silent><leader>s :A<CR>
+" Open test file for a current file in a vertical window
+nnoremap <silent><leader>v :AV<CR>
+" Vertically split screen
+nnoremap <silent><leader>\ :vs<CR>
+" Split screen
+nnoremap <silent><leader>/ :split<CR>
+
+" Faster saving and exiting
+nnoremap <silent><leader>w :w!<CR>
+nnoremap <silent><leader>q :q!<CR>
+nnoremap <silent><leader>x :x<CR>
+" Open Vim configuration file for editing
+nnoremap <silent><leader>2 :e ~/.vimrc<CR>
+" Source Vim configuration file and install plugins
+nnoremap <silent><leader>1 :source ~/.vimrc \| :PlugInstall<CR>
+
+" If fzf installed using git
+set rtp+=~/.fzf
+" Map fzf search to CTRL P
+nnoremap <C-p> :FZF<Cr>
+" Map fzf + ag search to CTRL P
+nnoremap <C-g> :Rg <Cr>
+
+" vim-test shortcut for running tests
+nnoremap <silent><leader>; :TestNearest<CR>
+nnoremap <silent><leader>' :TestFile<CR>
+
+" Extra <CR> is for disabling /"Press ENTER or type command to continue/"
+nnoremap <silent><leader>e :Exp<CR><CR>
+
+" Easier movement between split windows CTRL + {h, j, k, l}
+nnoremap <c-h> <c-w>h
+nnoremap <c-j> <c-w>j
+nnoremap <c-k> <c-w>k
+nnoremap <c-l> <c-w>l
 " }}}
 
 " JavaScript Coc: {{{
@@ -115,7 +238,7 @@ inoremap <silent><expr> <TAB>
       \ coc#refresh()
 inoremap <expr><S-TAB> coc#pum#visible() ? coc#pum#prev(1) : "\<C-h>"
 
-" Make <CR> to accept selected completion item or notify coc.nvim to format
+" Make <CR> to accept selected completion item or notify coc.nvim to ememormat
 " <C-g>u breaks current undo, please make your own choice.
 inoremap <silent><expr> <CR> coc#pum#visible() ? coc#pum#confirm()
                               \: "\<C-g>u\<CR>\<c-r>=coc#on_enter()\<CR>"
@@ -162,7 +285,7 @@ nmap <leader>rn <Plug>(coc-rename)
 
 " Formatting selected code.
 xmap <leader>f  <Plug>(coc-format-selected)
-nmap <leader>f  <Plug>(coc-format-selected)
+nmap <leader>fo   :CocCommand prettier.formatFile<CR>
 
 augroup mygroup
   autocmd!
@@ -283,7 +406,7 @@ augroup omnisharp_commands
 
   autocmd FileType cs nnoremap <Leader><Space> :OmniSharpGetCodeActions<CR>
 
-  autocmd FileType cs nmap <silent> <buffer> <Leader>osnm <Plug>(omnisharp_rename)
+  autocmd FileType cs nmap <silent> <buffer> <Leader>rn <Plug>(omnisharp_rename)
   autocmd FileType cs nmap <silent> <buffer> <Leader>osre <Plug>(omnisharp_restart_server)
   autocmd FileType cs nmap <silent> <buffer> <Leader>osst <Plug>(omnisharp_start_server)
   autocmd FileType cs nmap <silent> <buffer> <Leader>ossp <Plug>(omnisharp_stop_server)
