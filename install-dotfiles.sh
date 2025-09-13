@@ -17,6 +17,9 @@ stow tmux
 # Stow SSH separately to ~/.ssh
 stow -t ~/.ssh ssh
 
+# Stow Tmux separately to ~/.tmux
+stow -t ~/.tmux tmux 
+
 echo ">>> Dotfiles linked successfully!"
 
 # -----------------------------

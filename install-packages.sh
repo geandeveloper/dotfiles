@@ -31,11 +31,27 @@ echo ">>> Installing LazyVim..."
 
 # Setup LazyVim for Neovim
 NVIM_CONFIG_DIR="$HOME/.config/nvim"
-if [ ! -d "$NVIM_CONFIG_DIR" ]; then
+if [ -d "$NVIM_CONFIG_DIR" ]; then
+  echo ">>> LazyVim config already exists, skipping clone."
+else
   mkdir -p "$NVIM_CONFIG_DIR"
+  git clone https://github.com/LazyVim/starter.git "$NVIM_CONFIG_DIR" --depth 1
+  echo ">>> LazyVim installed successfully!"
 fi
 
-# Clone LazyVim starter template
-git clone https://github.com/LazyVim/starter.git "$NVIM_CONFIG_DIR" --depth 1
+echo ">>> Installing Tmux Plugin Manager (TPM)..."
 
-echo ">>> LazyVim installed successfully!"
+TPM_DIR="$HOME/.tmux/plugins/tpm"
+if [ -d "$TPM_DIR" ]; then
+  echo ">>> TPM already installed, skipping clone."
+else
+  git clone https://github.com/tmux-plugins/tpm "$TPM_DIR"
+  echo ">>> TPM installed successfully!"
+fi
+
+echo ">>> Updating Tmux plugins..."
+# Install or update Tmux plugins via TPM
+"$TPM_DIR"/bin/install_plugins || echo ">>> Plugins already installed or TPM not active."
+"$TPM_DIR"/bin/update_plugins all || echo ">>> Plugins already up-to-date or TPM not active."
+
+echo ">>> Setup completed!"
