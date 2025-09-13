@@ -1,0 +1,6 @@
+[user]
+    name = Gean Silva
+    email = geandeveloper@gmail.com
+
+[core]
+    sshCommand = ssh -i ~/.ssh/id_geandeveloper
