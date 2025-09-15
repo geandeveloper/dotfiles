@@ -12,15 +12,17 @@ echo ">>> Stowing dotfiles..."
 
 # Always overwrite existing files
 stow -R --adopt git
-stow -R --adopt nvim
 stow -R --adopt tmux
 stow -R --adopt zsh
+
+# Stow SSH separately to ~/.config
+stow -R --adopt -v -t ~/.config nvim
 
 # Stow SSH separately to ~/.ssh
 stow -R --adopt -t ~/.ssh ssh
 
 # Stow Tmux separately to ~/.tmux
-stow -R --adopt -t ~/.tmux tmux 
+stow -R --adopt -t ~/.tmux tmux
 
 echo ">>> Dotfiles linked successfully!"
 

@@ -8,6 +8,9 @@ require("keymaps")
 -- Load LSP config
 require("lsp")
 
+-- load user java config
+require("user.java")
+
 -- Basic options
 vim.opt.number = true
 vim.opt.relativenumber = true
