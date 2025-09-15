@@ -10,15 +10,17 @@ cd "$(dirname "$0")"
 # -----------------------------
 echo ">>> Stowing dotfiles..."
 
-stow git
-stow nvim
-stow tmux
+# Always overwrite existing files
+stow -R --adopt git
+stow -R --adopt nvim
+stow -R --adopt tmux
+stow -R --adopt zsh
 
 # Stow SSH separately to ~/.ssh
-stow -t ~/.ssh ssh
+stow -R --adopt -t ~/.ssh ssh
 
 # Stow Tmux separately to ~/.tmux
-stow -t ~/.tmux tmux 
+stow -R --adopt -t ~/.tmux tmux 
 
 echo ">>> Dotfiles linked successfully!"
 

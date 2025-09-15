@@ -17,7 +17,8 @@ sudo apt install -y \
   wget \
   curl \
   ca-certificates \
-  gnupg
+  gnupg \
+  zsh
 
 # Install VS Code via Microsoft repo
 wget -qO- https://packages.microsoft.com/keys/microsoft.asc | gpg --dearmor >microsoft.gpg
@@ -53,5 +54,41 @@ echo ">>> Updating Tmux plugins..."
 # Install or update Tmux plugins via TPM
 "$TPM_DIR"/bin/install_plugins || echo ">>> Plugins already installed or TPM not active."
 "$TPM_DIR"/bin/update_plugins all || echo ">>> Plugins already up-to-date or TPM not active."
+
+echo ">>> Installing Oh My Zsh..."
+
+ZSH_DIR="$HOME/.oh-my-zsh"
+if [ -d "$ZSH_DIR" ]; then
+  echo ">>> Oh My Zsh already installed, skipping clone."
+else
+  git clone https://github.com/ohmyzsh/ohmyzsh.git "$ZSH_DIR"
+  echo ">>> Oh My Zsh installed successfully!"
+fi
+
+echo ">>> Installing Oh My Zsh plugins..."
+
+ZSH_CUSTOM="${ZSH_CUSTOM:-$HOME/.oh-my-zsh/custom}"
+
+# zsh-autosuggestions
+if [ -d "$ZSH_CUSTOM/plugins/zsh-autosuggestions" ]; then
+  echo ">>> zsh-autosuggestions already installed, skipping clone."
+else
+  git clone https://github.com/zsh-users/zsh-autosuggestions "$ZSH_CUSTOM/plugins/zsh-autosuggestions"
+  echo ">>> zsh-autosuggestions installed successfully!"
+fi
+
+# zsh-syntax-highlighting
+if [ -d "$ZSH_CUSTOM/plugins/zsh-syntax-highlighting" ]; then
+  echo ">>> zsh-syntax-highlighting already installed, skipping clone."
+else
+  git clone https://github.com/zsh-users/zsh-syntax-highlighting "$ZSH_CUSTOM/plugins/zsh-syntax-highlighting"
+  echo ">>> zsh-syntax-highlighting installed successfully!"
+fi
+
+# Set Zsh as default shell if not already
+if [ "$SHELL" != "$(which zsh)" ]; then
+  echo ">>> Changing default shell to zsh..."
+  chsh -s "$(which zsh)"
+fi
 
 echo ">>> Setup completed!"
